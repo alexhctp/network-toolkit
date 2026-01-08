@@ -13,7 +13,7 @@ import (
 
 const (
 	appTitle   = "Network Toolkit 🔧"
-	appVersion = "1.1.0"
+	appVersion = "1.2.0"
 )
 
 func main() {
@@ -39,6 +39,8 @@ func main() {
 			handleListeningPorts()
 		case "2":
 			handleNetworkScan(reader)
+		case "3":
+			handleStealthyScan(reader)
 		case "0":
 			fmt.Println("\n👋 Encerrando Network Toolkit. Até logo!")
 			os.Exit(0)
@@ -65,6 +67,7 @@ func showMenu() {
 	fmt.Println(strings.Repeat("-", 60))
 	fmt.Println("[1] Listar Portas em Escuta (netstat -tuln)")
 	fmt.Println("[2] Scanner de Rede (nmap -sS -sV -p-)")
+	fmt.Println("[3] Scanner Stealth de Host Único (nmap -sS -sV -p- -T4)")
 	fmt.Println("[0] Sair")
 	fmt.Println(strings.Repeat("-", 60))
 }
@@ -193,6 +196,142 @@ func handleNetworkScan(reader *bufio.Reader) {
 	network.PrintScanResults(results)
 
 	fmt.Println("\n✅ Scan concluído!")
+}
+
+// handleStealthyScan trata a opção de scan stealth de host único
+func handleStealthyScan(reader *bufio.Reader) {
+	clearScreen()
+	fmt.Println("\n🎯 SCANNER STEALTH DE HOST ÚNICO")
+	fmt.Println(strings.Repeat("=", 60))
+	fmt.Println("\nEste scanner realiza uma varredura detalhada em um único alvo:")
+	fmt.Println("  • TCP SYN Scan (stealth)")
+	fmt.Println("  • Detecção de versão de serviços")
+	fmt.Println("  • Scan de todas as portas (1-65535)")
+	fmt.Println("  • Timing agressivo (T4)")
+	fmt.Println("  • Motivo da detecção (--reason)\n")
+
+	// Solicitar IP alvo
+	fmt.Print("🎯 Digite o IP do alvo (ex: 192.168.1.20): ")
+	ipInput, _ := reader.ReadString('\n')
+	ipInput = strings.TrimSpace(ipInput)
+
+	if ipInput == "" {
+		fmt.Println("\n❌ IP não pode ser vazio!")
+		return
+	}
+
+	// Solicitar tipo de scan
+	fmt.Println("\n🔍 Tipo de scan:")
+	fmt.Println("   [1] Rápido - Portas comuns (1-1024)")
+	fmt.Println("   [2] Completo - Todas as portas (1-65535)")
+	fmt.Println("   [3] Personalizado - Range específico")
+	fmt.Print("\nEscolha uma opção [1]: ")
+	scanOption, _ := reader.ReadString('\n')
+	scanOption = strings.TrimSpace(scanOption)
+
+	if scanOption == "" {
+		scanOption = "1"
+	}
+
+	var startPort, endPort, threads int
+
+	switch scanOption {
+	case "1":
+		startPort = 1
+		endPort = 1024
+		threads = 50
+	case "2":
+		startPort = 1
+		endPort = 65535
+		threads = 100
+	case "3":
+		fmt.Print("Digite a porta inicial (ex: 1): ")
+		startInput, _ := reader.ReadString('\n')
+		startInput = strings.TrimSpace(startInput)
+		if s, err := strconv.Atoi(startInput); err == nil && s > 0 && s <= 65535 {
+			startPort = s
+		} else {
+			startPort = 1
+		}
+
+		fmt.Print("Digite a porta final (ex: 1000): ")
+		endInput, _ := reader.ReadString('\n')
+		endInput = strings.TrimSpace(endInput)
+		if e, err := strconv.Atoi(endInput); err == nil && e > 0 && e <= 65535 && e >= startPort {
+			endPort = e
+		} else {
+			endPort = 1024
+		}
+
+		fmt.Print("Digite o número de threads [50]: ")
+		threadsInput, _ := reader.ReadString('\n')
+		threadsInput = strings.TrimSpace(threadsInput)
+		if t, err := strconv.Atoi(threadsInput); err == nil && t > 0 && t <= 200 {
+			threads = t
+		} else {
+			threads = 50
+		}
+	default:
+		startPort = 1
+		endPort = 1024
+		threads = 50
+	}
+
+	// Confirmação
+	totalPorts := endPort - startPort + 1
+	fmt.Println("\n" + strings.Repeat("-", 60))
+	fmt.Printf("⚙️  Configuração do Scan:\n")
+	fmt.Printf("   Target: %s/32\n", ipInput)
+	fmt.Printf("   Range: %d-%d (%d portas)\n", startPort, endPort, totalPorts)
+	fmt.Printf("   Threads: %d\n", threads)
+	fmt.Printf("   Tempo estimado: ")
+
+	// Estimar tempo baseado no número de portas e threads
+	estimatedSeconds := float64(totalPorts) / float64(threads) * 0.5
+	if estimatedSeconds < 60 {
+		fmt.Printf("~%.0f segundos\n", estimatedSeconds)
+	} else {
+		fmt.Printf("~%.1f minutos\n", estimatedSeconds/60)
+	}
+
+	fmt.Println(strings.Repeat("-", 60))
+	fmt.Println("\n⚠️  AVISO:")
+	fmt.Println("   • Este scan pode ser detectado por IDS/IPS")
+	fmt.Println("   • Use apenas em redes que você tem autorização")
+	fmt.Println("   • O scan pode demorar dependendo do firewall do alvo")
+	fmt.Println(strings.Repeat("-", 60))
+	fmt.Print("\nDeseja continuar? (s/N): ")
+	confirm, _ := reader.ReadString('\n')
+	confirm = strings.ToLower(strings.TrimSpace(confirm))
+
+	if confirm != "s" && confirm != "sim" {
+		fmt.Println("\n❌ Scan cancelado.")
+		return
+	}
+
+	// Configurar e executar scan
+	config := network.StealthyScanConfig{
+		TargetIP:         ipInput,
+		StartPort:        startPort,
+		EndPort:          endPort,
+		Timeout:          1 * time.Second,
+		Threads:          threads,
+		ServiceDetection: true,
+		AggressiveTiming: true,
+	}
+
+	fmt.Println("\n🚀 Iniciando scan stealth... Por favor, aguarde...")
+	fmt.Println(strings.Repeat("=", 90))
+
+	// Executar scan
+	report, err := network.ScanHostStealthy(config)
+	if err != nil {
+		fmt.Printf("\n❌ Erro ao executar scan: %v\n", err)
+		return
+	}
+
+	// Exibir relatório
+	network.PrintStealthyScanReport(report)
 }
 
 // clearScreen limpa a tela do terminal

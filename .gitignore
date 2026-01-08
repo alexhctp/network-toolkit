@@ -1,0 +1,32 @@
+# .gitignore para Network Toolkit
+
+# Binários compilados
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Arquivos de teste
+*.test
+*.out
+
+# Arquivos de dependências
+vendor/
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Arquivos temporários do Go
+*.tmp
+*.log
+
+# Arquivos de build
+dist/
+build/
+
+.github/
