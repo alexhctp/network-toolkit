@@ -28,7 +28,7 @@ func main() {
 		fmt.Print("\nEscolha uma opção: ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Printf("Erro ao ler entrada: %v\n", err)
+			fmt.Printf("Error reading input: %v\n", err)
 			continue
 		}
 
@@ -42,10 +42,10 @@ func main() {
 		case "3":
 			handleStealthyScan(reader)
 		case "0":
-			fmt.Println("\n👋 Encerrando Network Toolkit. Até logo!")
+			fmt.Println("\n👋 Closing Network Toolkit. Goodbye!")
 			os.Exit(0)
 		default:
-			fmt.Println("\n❌ Opção inválida! Por favor, escolha uma opção válida.")
+			fmt.Println("\n❌ Invalid option! Please choose a valid option.")
 		}
 
 		waitForEnter(reader)
@@ -56,40 +56,40 @@ func main() {
 func showHeader() {
 	fmt.Println("=" + strings.Repeat("=", 60))
 	fmt.Printf("  %s - v%s\n", appTitle, appVersion)
-	fmt.Println("  Canivete suíço para atividades de gerenciamento de redes")
+	fmt.Println("  Swiss army knife for network management activities")
 	fmt.Println("=" + strings.Repeat("=", 60))
 }
 
 // showMenu exibe o menu principal
 func showMenu() {
 	fmt.Println("\n" + strings.Repeat("-", 60))
-	fmt.Println("MENU PRINCIPAL")
+	fmt.Println("MAIN MENU")
 	fmt.Println(strings.Repeat("-", 60))
-	fmt.Println("[1] Listar Portas em Escuta (netstat -tuln)")
-	fmt.Println("[2] Scanner de Rede (nmap -sS -sV -p-)")
-	fmt.Println("[3] Scanner Stealth de Host Único (nmap -sS -sV -p- -T4)")
-	fmt.Println("[0] Sair")
+	fmt.Println("[1] List Listening Ports (netstat -tuln)")
+	fmt.Println("[2] Network Scanner (nmap -sS -sV -p-)")
+	fmt.Println("[3] Stealth Single-Host Scanner (nmap -sS -sV -p- -T4)")
+	fmt.Println("[0] Exit")
 	fmt.Println(strings.Repeat("-", 60))
 }
 
 // handleListeningPorts trata a opção de listar portas em escuta
 func handleListeningPorts() {
 	clearScreen()
-	fmt.Println("\n🔍 Buscando portas em escuta...")
-	fmt.Println("⚠️  Nota: Execute como Administrador para ver todos os processos\n")
+	fmt.Println("\n🔍 Searching for listening ports...")
+	fmt.Println("⚠️  Note: Run as Administrator to see all processes\n")
 
 	err := network.PrintListeningPorts()
 	if err != nil {
-		fmt.Printf("\n❌ Erro ao listar portas: %v\n", err)
+		fmt.Printf("\n❌ Error listing ports: %v\n", err)
 		return
 	}
 
-	fmt.Println("\n✅ Operação concluída!")
+	fmt.Println("\n✅ Operation completed!")
 }
 
 // waitForEnter aguarda o usuário pressionar Enter
 func waitForEnter(reader *bufio.Reader) {
-	fmt.Print("\nPressione ENTER para continuar...")
+	fmt.Print("\nPress ENTER to continue...")
 	reader.ReadString('\n')
 	clearScreen()
 	showHeader()
@@ -98,30 +98,30 @@ func waitForEnter(reader *bufio.Reader) {
 // handleNetworkScan trata a opção de scan de rede
 func handleNetworkScan(reader *bufio.Reader) {
 	clearScreen()
-	fmt.Println("\n🔍 SCANNER DE REDE")
+	fmt.Println("\n🔍 NETWORK SCANNER")
 	fmt.Println(strings.Repeat("=", 60))
-	fmt.Println("\nEste scanner realiza uma varredura similar ao nmap:")
-	fmt.Println("  • Detecta hosts ativos na rede")
-	fmt.Println("  • Escaneia portas TCP")
-	fmt.Println("  • Identifica serviços em execução")
-	fmt.Println("  • Captura banners de serviços\n")
+	fmt.Println("\nThis scanner performs an nmap-like scan:")
+	fmt.Println("  • Detects active hosts on the network")
+	fmt.Println("  • Scans TCP ports")
+	fmt.Println("  • Identifies running services")
+	fmt.Println("  • Captures service banners\n")
 
-	// Solicitar rede CIDR
-	fmt.Print("📡 Digite a rede em formato CIDR (ex: 192.168.1.0/24): ")
+	// Request CIDR network
+	fmt.Print("📡 Enter network in CIDR format (e.g., 192.168.1.0/24): ")
 	networkInput, _ := reader.ReadString('\n')
 	networkInput = strings.TrimSpace(networkInput)
 
 	if networkInput == "" {
-		fmt.Println("\n❌ Rede não pode ser vazia!")
+		fmt.Println("\n❌ Network cannot be empty!")
 		return
 	}
 
-	// Solicitar range de portas
-	fmt.Println("\n🔌 Opções de portas:")
-	fmt.Println("   [1] Portas comuns (rápido - ~20 portas)")
-	fmt.Println("   [2] Range específico (ex: 1-1024)")
-	fmt.Println("   [3] Portas específicas (ex: 80,443,8080)")
-	fmt.Print("\nEscolha uma opção [1]: ")
+	// Request port range
+	fmt.Println("\n🔌 Port options:")
+	fmt.Println("   [1] Common ports (fast - ~20 ports)")
+	fmt.Println("   [2] Specific range (e.g., 1-1024)")
+	fmt.Println("   [3] Specific ports (e.g., 80,443,8080)")
+	fmt.Print("\nChoose an option [1]: ")
 	portOption, _ := reader.ReadString('\n')
 	portOption = strings.TrimSpace(portOption)
 
@@ -132,21 +132,21 @@ func handleNetworkScan(reader *bufio.Reader) {
 	var portRange string
 	switch portOption {
 	case "1":
-		portRange = "all" // Usará portas comuns
+		portRange = "all" // Will use common ports
 	case "2":
-		fmt.Print("Digite o range (ex: 1-1024): ")
+		fmt.Print("Enter range (e.g., 1-1024): ")
 		portInput, _ := reader.ReadString('\n')
 		portRange = strings.TrimSpace(portInput)
 	case "3":
-		fmt.Print("Digite as portas separadas por vírgula (ex: 80,443,8080): ")
+		fmt.Print("Enter ports separated by commas (e.g., 80,443,8080): ")
 		portInput, _ := reader.ReadString('\n')
 		portRange = strings.TrimSpace(portInput)
 	default:
 		portRange = "all"
 	}
 
-	// Solicitar número de threads
-	fmt.Print("\n⚙️  Número de threads [10]: ")
+	// Request number of threads
+	fmt.Print("\n⚙️  Number of threads [10]: ")
 	threadsInput, _ := reader.ReadString('\n')
 	threadsInput = strings.TrimSpace(threadsInput)
 	threads := 10
@@ -156,19 +156,19 @@ func handleNetworkScan(reader *bufio.Reader) {
 		}
 	}
 
-	// Confirmação
+	// Confirmation
 	fmt.Println("\n" + strings.Repeat("-", 60))
-	fmt.Println("⚠️  AVISO: O scan de rede pode:")
-	fmt.Println("   • Demorar vários minutos dependendo da rede")
-	fmt.Println("   • Ser detectado por sistemas de segurança")
-	fmt.Println("   • Gerar tráfego de rede significativo")
+	fmt.Println("⚠️  WARNING: The network scan may:")
+	fmt.Println("   • Take several minutes depending on the network")
+	fmt.Println("   • Be detected by security systems")
+	fmt.Println("   • Generate significant network traffic")
 	fmt.Println(strings.Repeat("-", 60))
-	fmt.Print("\nDeseja continuar? (s/N): ")
+	fmt.Print("\nDo you want to continue? (y/N): ")
 	confirm, _ := reader.ReadString('\n')
 	confirm = strings.ToLower(strings.TrimSpace(confirm))
 
-	if confirm != "s" && confirm != "sim" {
-		fmt.Println("\n❌ Scan cancelado.")
+	if confirm != "y" && confirm != "yes" {
+		fmt.Println("\n❌ Scan cancelled.")
 		return
 	}
 
@@ -182,50 +182,50 @@ func handleNetworkScan(reader *bufio.Reader) {
 		OSDetection:      false,
 	}
 
-	fmt.Println("\n🚀 Iniciando scan... Por favor, aguarde...")
+	fmt.Println("\n🚀 Starting scan... Please wait...")
 	fmt.Println("")
 
-	// Executar scan
+	// Execute scan
 	results, err := network.ScanNetwork(config)
 	if err != nil {
-		fmt.Printf("\n❌ Erro ao executar scan: %v\n", err)
+		fmt.Printf("\n❌ Error executing scan: %v\n", err)
 		return
 	}
 
-	// Exibir resultados
+	// Display results
 	network.PrintScanResults(results)
 
-	fmt.Println("\n✅ Scan concluído!")
+	fmt.Println("\n✅ Scan completed!")
 }
 
 // handleStealthyScan trata a opção de scan stealth de host único
 func handleStealthyScan(reader *bufio.Reader) {
 	clearScreen()
-	fmt.Println("\n🎯 SCANNER STEALTH DE HOST ÚNICO")
+	fmt.Println("\n🎯 STEALTH SINGLE-HOST SCANNER")
 	fmt.Println(strings.Repeat("=", 60))
-	fmt.Println("\nEste scanner realiza uma varredura detalhada em um único alvo:")
+	fmt.Println("\nThis scanner performs a detailed scan on a single target:")
 	fmt.Println("  • TCP SYN Scan (stealth)")
-	fmt.Println("  • Detecção de versão de serviços")
-	fmt.Println("  • Scan de todas as portas (1-65535)")
-	fmt.Println("  • Timing agressivo (T4)")
-	fmt.Println("  • Motivo da detecção (--reason)\n")
+	fmt.Println("  • Service version detection")
+	fmt.Println("  • Full port scan (1-65535)")
+	fmt.Println("  • Aggressive timing (T4)")
+	fmt.Println("  • Detection reason (--reason)\n")
 
-	// Solicitar IP alvo
-	fmt.Print("🎯 Digite o IP do alvo (ex: 192.168.1.20): ")
+	// Request target IP
+	fmt.Print("🎯 Enter target IP (e.g., 192.168.1.20): ")
 	ipInput, _ := reader.ReadString('\n')
 	ipInput = strings.TrimSpace(ipInput)
 
 	if ipInput == "" {
-		fmt.Println("\n❌ IP não pode ser vazio!")
+		fmt.Println("\n❌ IP cannot be empty!")
 		return
 	}
 
-	// Solicitar tipo de scan
-	fmt.Println("\n🔍 Tipo de scan:")
-	fmt.Println("   [1] Rápido - Portas comuns (1-1024)")
-	fmt.Println("   [2] Completo - Todas as portas (1-65535)")
-	fmt.Println("   [3] Personalizado - Range específico")
-	fmt.Print("\nEscolha uma opção [1]: ")
+	// Request scan type
+	fmt.Println("\n🔍 Scan type:")
+	fmt.Println("   [1] Quick - Common ports (1-1024)")
+	fmt.Println("   [2] Full - All ports (1-65535)")
+	fmt.Println("   [3] Custom - Specific range")
+	fmt.Print("\nChoose an option [1]: ")
 	scanOption, _ := reader.ReadString('\n')
 	scanOption = strings.TrimSpace(scanOption)
 
@@ -245,7 +245,7 @@ func handleStealthyScan(reader *bufio.Reader) {
 		endPort = 65535
 		threads = 100
 	case "3":
-		fmt.Print("Digite a porta inicial (ex: 1): ")
+		fmt.Print("Enter starting port (e.g., 1): ")
 		startInput, _ := reader.ReadString('\n')
 		startInput = strings.TrimSpace(startInput)
 		if s, err := strconv.Atoi(startInput); err == nil && s > 0 && s <= 65535 {
@@ -254,7 +254,7 @@ func handleStealthyScan(reader *bufio.Reader) {
 			startPort = 1
 		}
 
-		fmt.Print("Digite a porta final (ex: 1000): ")
+		fmt.Print("Enter ending port (e.g., 1000): ")
 		endInput, _ := reader.ReadString('\n')
 		endInput = strings.TrimSpace(endInput)
 		if e, err := strconv.Atoi(endInput); err == nil && e > 0 && e <= 65535 && e >= startPort {
@@ -263,7 +263,7 @@ func handleStealthyScan(reader *bufio.Reader) {
 			endPort = 1024
 		}
 
-		fmt.Print("Digite o número de threads [50]: ")
+		fmt.Print("Enter number of threads [50]: ")
 		threadsInput, _ := reader.ReadString('\n')
 		threadsInput = strings.TrimSpace(threadsInput)
 		if t, err := strconv.Atoi(threadsInput); err == nil && t > 0 && t <= 200 {
@@ -277,35 +277,35 @@ func handleStealthyScan(reader *bufio.Reader) {
 		threads = 50
 	}
 
-	// Confirmação
+	// Confirmation
 	totalPorts := endPort - startPort + 1
 	fmt.Println("\n" + strings.Repeat("-", 60))
-	fmt.Printf("⚙️  Configuração do Scan:\n")
+	fmt.Printf("⚙️  Scan Configuration:\n")
 	fmt.Printf("   Target: %s/32\n", ipInput)
-	fmt.Printf("   Range: %d-%d (%d portas)\n", startPort, endPort, totalPorts)
+	fmt.Printf("   Range: %d-%d (%d ports)\n", startPort, endPort, totalPorts)
 	fmt.Printf("   Threads: %d\n", threads)
-	fmt.Printf("   Tempo estimado: ")
+	fmt.Printf("   Estimated time: ")
 
-	// Estimar tempo baseado no número de portas e threads
+	// Estimate time based on number of ports and threads
 	estimatedSeconds := float64(totalPorts) / float64(threads) * 0.5
 	if estimatedSeconds < 60 {
-		fmt.Printf("~%.0f segundos\n", estimatedSeconds)
+		fmt.Printf("~%.0f seconds\n", estimatedSeconds)
 	} else {
-		fmt.Printf("~%.1f minutos\n", estimatedSeconds/60)
+		fmt.Printf("~%.1f minutes\n", estimatedSeconds/60)
 	}
 
 	fmt.Println(strings.Repeat("-", 60))
-	fmt.Println("\n⚠️  AVISO:")
-	fmt.Println("   • Este scan pode ser detectado por IDS/IPS")
-	fmt.Println("   • Use apenas em redes que você tem autorização")
-	fmt.Println("   • O scan pode demorar dependendo do firewall do alvo")
+	fmt.Println("\n⚠️  WARNING:")
+	fmt.Println("   • This scan may be detected by IDS/IPS")
+	fmt.Println("   • Use only on networks you have authorization for")
+	fmt.Println("   • The scan may take time depending on target's firewall")
 	fmt.Println(strings.Repeat("-", 60))
-	fmt.Print("\nDeseja continuar? (s/N): ")
+	fmt.Print("\nDo you want to continue? (y/N): ")
 	confirm, _ := reader.ReadString('\n')
 	confirm = strings.ToLower(strings.TrimSpace(confirm))
 
-	if confirm != "s" && confirm != "sim" {
-		fmt.Println("\n❌ Scan cancelado.")
+	if confirm != "y" && confirm != "yes" {
+		fmt.Println("\n❌ Scan cancelled.")
 		return
 	}
 
@@ -320,17 +320,17 @@ func handleStealthyScan(reader *bufio.Reader) {
 		AggressiveTiming: true,
 	}
 
-	fmt.Println("\n🚀 Iniciando scan stealth... Por favor, aguarde...")
+	fmt.Println("\n🚀 Starting stealth scan... Please wait...")
 	fmt.Println(strings.Repeat("=", 90))
 
-	// Executar scan
+	// Execute scan
 	report, err := network.ScanHostStealthy(config)
 	if err != nil {
-		fmt.Printf("\n❌ Erro ao executar scan: %v\n", err)
+		fmt.Printf("\n❌ Error executing scan: %v\n", err)
 		return
 	}
 
-	// Exibir relatório
+	// Display report
 	network.PrintStealthyScanReport(report)
 }
 

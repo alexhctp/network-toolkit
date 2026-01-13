@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// StealthyScanResult representa o resultado detalhado de um scan stealth
+// StealthyScanResult represents the detailed result of a stealth scan
 type StealthyScanResult struct {
 	IP           string
 	Port         int
@@ -19,10 +19,10 @@ type StealthyScanResult struct {
 	Version      string
 	Banner       string
 	ResponseTime time.Duration
-	Reason       string // Motivo da detecção
+	Reason       string // Detection reason
 }
 
-// StealthyScanReport relatório completo do scan stealth
+// StealthyScanReport complete stealth scan report
 type StealthyScanReport struct {
 	TargetIP      string
 	Hostname      string
@@ -35,7 +35,7 @@ type StealthyScanReport struct {
 	ScanDate      time.Time
 }
 
-// StealthyScanConfig configuração do scan stealth
+// StealthyScanConfig stealth scan configuration
 type StealthyScanConfig struct {
 	TargetIP         string
 	StartPort        int
@@ -46,7 +46,7 @@ type StealthyScanConfig struct {
 	AggressiveTiming bool // T4 timing
 }
 
-// ScanPortStealthy realiza scan stealth em uma porta específica
+// ScanPortStealthy performs stealth scan on a specific port
 func ScanPortStealthy(ip string, port int, timeout time.Duration, serviceDetection bool) StealthyScanResult {
 	result := StealthyScanResult{
 		IP:      ip,
@@ -60,12 +60,12 @@ func ScanPortStealthy(ip string, port int, timeout time.Duration, serviceDetecti
 	start := time.Now()
 	address := fmt.Sprintf("%s:%d", ip, port)
 
-	// Tentar conexão TCP
+	// Try TCP connection
 	conn, err := net.DialTimeout("tcp", address, timeout)
 	result.ResponseTime = time.Since(start)
 
 	if err != nil {
-		// Analisar o tipo de erro
+		// Analyze error type
 		if strings.Contains(err.Error(), "timeout") {
 			result.State = "filtered"
 			result.Reason = "no-response (timeout)"
@@ -80,26 +80,26 @@ func ScanPortStealthy(ip string, port int, timeout time.Duration, serviceDetecti
 	}
 	defer conn.Close()
 
-	// Porta está aberta
+	// Port is open
 	result.IsOpen = true
 	result.State = "open"
 	result.Reason = "syn-ack"
 
-	// Identificar serviço pela porta
+	// Identify service by port
 	if service, exists := commonServices[port]; exists {
 		result.Service = service
 	}
 
-	// Detecção de versão através de banner grabbing
+	// Version detection through banner grabbing
 	if serviceDetection {
 		conn.SetReadDeadline(time.Now().Add(timeout))
 		buffer := make([]byte, 2048)
 		n, err := conn.Read(buffer)
 		if err == nil && n > 0 {
 			result.Banner = strings.TrimSpace(string(buffer[:n]))
-			// Extrair versão do banner
+			// Extract version from banner
 			result.Version = extractVersionFromBanner(result.Banner)
-			// Identificar serviço pelo banner
+			// Identify service by banner
 			result.Service = identifyServiceByBanner(result.Banner, result.Service)
 		}
 	}
@@ -107,13 +107,13 @@ func ScanPortStealthy(ip string, port int, timeout time.Duration, serviceDetecti
 	return result
 }
 
-// extractVersionFromBanner extrai informação de versão do banner
+// extractVersionFromBanner extracts version information from banner
 func extractVersionFromBanner(banner string) string {
 	banner = strings.TrimSpace(banner)
 	lines := strings.Split(banner, "\n")
 	if len(lines) > 0 {
 		firstLine := strings.TrimSpace(lines[0])
-		// Limitar tamanho da versão
+		// Limit version size
 		if len(firstLine) > 60 {
 			return firstLine[:57] + "..."
 		}
@@ -122,7 +122,7 @@ func extractVersionFromBanner(banner string) string {
 	return ""
 }
 
-// ScanHostStealthy realiza scan stealth completo em um host
+// ScanHostStealthy performs complete stealth scan on a host
 func ScanHostStealthy(config StealthyScanConfig) (*StealthyScanReport, error) {
 	report := &StealthyScanReport{
 		TargetIP:   config.TargetIP,
@@ -130,9 +130,9 @@ func ScanHostStealthy(config StealthyScanConfig) (*StealthyScanReport, error) {
 		ScanDate:   time.Now(),
 	}
 
-	// Validar IP
+	// Validate IP
 	if net.ParseIP(config.TargetIP) == nil {
-		return nil, fmt.Errorf("IP inválido: %s", config.TargetIP)
+		return nil, fmt.Errorf("invalid IP: %s", config.TargetIP)
 	}
 
 	// Resolver hostname
@@ -174,7 +174,7 @@ func ScanHostStealthy(config StealthyScanConfig) (*StealthyScanReport, error) {
 		}()
 	}
 
-	// Enviar portas para scan
+	// Send ports for scanning
 	go func() {
 		for port := config.StartPort; port <= config.EndPort; port++ {
 			portsChan <- port
@@ -182,15 +182,15 @@ func ScanHostStealthy(config StealthyScanConfig) (*StealthyScanReport, error) {
 		close(portsChan)
 	}()
 
-	// Aguardar conclusão dos workers
+	// Wait for workers to complete
 	go func() {
 		wg.Wait()
 		close(resultsChan)
 	}()
 
-	// Coletar resultados e mostrar progresso
+	// Collect results and show progress
 	scanned := 0
-	progressInterval := report.TotalPorts / 20 // Mostrar progresso a cada 5%
+	progressInterval := report.TotalPorts / 20 // Show progress every 5%
 	if progressInterval < 100 {
 		progressInterval = 100
 	}
@@ -199,11 +199,11 @@ func ScanHostStealthy(config StealthyScanConfig) (*StealthyScanReport, error) {
 		report.Results = append(report.Results, result)
 		scanned++
 
-		// Atualizar contadores
+		// Update counters
 		switch result.State {
 		case "open":
 			report.OpenPorts++
-			// Mostrar portas abertas imediatamente
+			// Show open ports immediately
 			fmt.Printf("✅ Port %d/%s \t%s \t%s\n",
 				result.Port,
 				"tcp",
@@ -215,16 +215,16 @@ func ScanHostStealthy(config StealthyScanConfig) (*StealthyScanReport, error) {
 			report.FilteredPorts++
 		}
 
-		// Mostrar progresso
+		// Show progress
 		if scanned%progressInterval == 0 {
 			progress := float64(scanned) / float64(report.TotalPorts) * 100
-			fmt.Printf("⏳ Progresso: %.0f%% (%d/%d portas escaneadas)\n", progress, scanned, report.TotalPorts)
+			fmt.Printf("⏳ Progress: %.0f%% (%d/%d ports scanned)\n", progress, scanned, report.TotalPorts)
 		}
 	}
 
 	report.ScanDuration = time.Since(start)
 
-	// Ordenar resultados por número de porta
+	// Sort results by port number
 	sort.Slice(report.Results, func(i, j int) bool {
 		return report.Results[i].Port < report.Results[j].Port
 	})
@@ -232,10 +232,10 @@ func ScanHostStealthy(config StealthyScanConfig) (*StealthyScanReport, error) {
 	return report, nil
 }
 
-// PrintStealthyScanReport imprime o relatório detalhado do scan
+// PrintStealthyScanReport prints the detailed scan report
 func PrintStealthyScanReport(report *StealthyScanReport) {
 	fmt.Println("\n" + strings.Repeat("=", 90))
-	fmt.Println("🎯 RELATÓRIO DE SCAN STEALTH (NMAP-LIKE)")
+	fmt.Println("🎯 STEALTH SCAN REPORT (NMAP-LIKE)")
 	fmt.Println(strings.Repeat("=", 90))
 
 	fmt.Printf("\n📍 TARGET: %s", report.TargetIP)
@@ -243,23 +243,23 @@ func PrintStealthyScanReport(report *StealthyScanReport) {
 		fmt.Printf(" (%s)", report.Hostname)
 	}
 	fmt.Println()
-	fmt.Printf("📅 Data do Scan: %s\n", report.ScanDate.Format("2006-01-02 15:04:05"))
-	fmt.Printf("⏱️  Duração: %v\n", report.ScanDuration.Round(time.Millisecond))
+	fmt.Printf("📅 Scan Date: %s\n", report.ScanDate.Format("2006-01-02 15:04:05"))
+	fmt.Printf("⏱️  Duration: %v\n", report.ScanDuration.Round(time.Millisecond))
 
 	fmt.Println("\n" + strings.Repeat("-", 90))
-	fmt.Println("📊 ESTATÍSTICAS")
+	fmt.Println("📊 STATISTICS")
 	fmt.Println(strings.Repeat("-", 90))
-	fmt.Printf("Total de portas escaneadas: %d\n", report.TotalPorts)
-	fmt.Printf("   🟢 Abertas:   %d\n", report.OpenPorts)
-	fmt.Printf("   🔴 Fechadas:  %d\n", report.ClosedPorts)
-	fmt.Printf("   🟡 Filtradas: %d\n", report.FilteredPorts)
+	fmt.Printf("Total ports scanned: %d\n", report.TotalPorts)
+	fmt.Printf("   🟢 Open:     %d\n", report.OpenPorts)
+	fmt.Printf("   🔴 Closed:   %d\n", report.ClosedPorts)
+	fmt.Printf("   🟡 Filtered: %d\n", report.FilteredPorts)
 
-	// Mostrar apenas portas abertas no relatório final
+	// Show only open ports in final report
 	if report.OpenPorts > 0 {
 		fmt.Println("\n" + strings.Repeat("-", 90))
-		fmt.Println("🔓 PORTAS ABERTAS DETECTADAS")
+		fmt.Println("🔓 DETECTED OPEN PORTS")
 		fmt.Println(strings.Repeat("-", 90))
-		fmt.Printf("%-10s %-10s %-15s %-20s %-30s\n", "PORTA", "ESTADO", "SERVIÇO", "RAZÃO", "VERSÃO/BANNER")
+		fmt.Printf("%-10s %-10s %-15s %-20s %-30s\n", "PORT", "STATE", "SERVICE", "REASON", "VERSION/BANNER")
 		fmt.Println(strings.Repeat("-", 90))
 
 		for _, result := range report.Results {
@@ -283,12 +283,12 @@ func PrintStealthyScanReport(report *StealthyScanReport) {
 		}
 	}
 
-	// Mostrar portas filtradas se houver
+	// Show filtered ports if any
 	if report.FilteredPorts > 0 && report.FilteredPorts <= 50 {
 		fmt.Println("\n" + strings.Repeat("-", 90))
-		fmt.Println("🟡 PORTAS FILTRADAS (Possível Firewall)")
+		fmt.Println("🟡 FILTERED PORTS (Possible Firewall)")
 		fmt.Println(strings.Repeat("-", 90))
-		fmt.Printf("%-10s %-10s %-20s\n", "PORTA", "ESTADO", "RAZÃO")
+		fmt.Printf("%-10s %-10s %-20s\n", "PORT", "STATE", "REASON")
 		fmt.Println(strings.Repeat("-", 90))
 
 		count := 0
@@ -299,25 +299,25 @@ func PrintStealthyScanReport(report *StealthyScanReport) {
 			}
 		}
 		if report.FilteredPorts > 20 {
-			fmt.Printf("\n... e mais %d porta(s) filtrada(s)\n", report.FilteredPorts-20)
+			fmt.Printf("\n... and %d more filtered port(s)\n", report.FilteredPorts-20)
 		}
 	}
 
 	fmt.Println("\n" + strings.Repeat("=", 90))
-	fmt.Println("✅ Scan concluído com sucesso!")
+	fmt.Println("✅ Scan completed successfully!")
 	fmt.Println(strings.Repeat("=", 90) + "\n")
 }
 
-// GetCommonPortsRange retorna ranges de portas comuns para scan rápido
+// GetCommonPortsRange returns common port ranges for quick scan
 func GetCommonPortsRange() []string {
 	return []string{
-		"1-1024",      // Portas well-known
-		"1025-49151",  // Portas registradas
-		"49152-65535", // Portas dinâmicas/privadas
+		"1-1024",      // Well-known ports
+		"1025-49151",  // Registered ports
+		"49152-65535", // Dynamic/private ports
 	}
 }
 
-// QuickScanHost realiza um scan rápido apenas de portas comuns
+// QuickScanHost performs a quick scan of common ports only
 func QuickScanHost(targetIP string) (*StealthyScanReport, error) {
 	config := StealthyScanConfig{
 		TargetIP:         targetIP,
@@ -332,7 +332,7 @@ func QuickScanHost(targetIP string) (*StealthyScanReport, error) {
 	return ScanHostStealthy(config)
 }
 
-// FullScanHost realiza scan completo de todas as portas
+// FullScanHost performs full scan of all ports
 func FullScanHost(targetIP string, threads int) (*StealthyScanReport, error) {
 	config := StealthyScanConfig{
 		TargetIP:         targetIP,

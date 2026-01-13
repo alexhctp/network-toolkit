@@ -1,145 +1,145 @@
 # Network Toolkit 🔧
 
-Canivete suíço para atividades de gerenciamento de redes desenvolvido em Go.
+Swiss army knife for network management activities developed in Go.
 
-## 📋 Descrição
+## 📋 Description
 
-Network Toolkit é uma aplicação de linha de comando que fornece ferramentas avançadas para administradores de sistemas e profissionais de segurança gerenciarem, monitorarem e auditarem conexões de rede. A aplicação oferece uma interface interativa e fácil de usar, com funcionalidades equivalentes ao nmap, netstat e outras ferramentas de rede essenciais.
+Network Toolkit is a command-line application that provides advanced tools for system administrators and security professionals to manage, monitor, and audit network connections. The application offers an interactive and easy-to-use interface, with functionalities equivalent to nmap, netstat, and other essential network tools.
 
-## ✨ Funcionalidades Implementadas
+## ✨ Implemented Features
 
-### 1. Listar Portas em Escuta
-Alternativa ao comando `netstat -tuln` (Linux) ou `Get-NetTCPConnection -State Listen` (PowerShell).
+### 1. List Listening Ports
+Alternative to `netstat -tuln` command (Linux) or `Get-NetTCPConnection -State Listen` (PowerShell).
 
-Exibe todas as portas TCP em estado de escuta com:
-- ✅ Endereço local
-- ✅ Porta
-- ✅ Estado da conexão
-- ✅ PID do processo
-- ✅ Nome do processo
+Displays all TCP ports in listening state with:
+- ✅ Local address
+- ✅ Port
+- ✅ Connection state
+- ✅ Process PID
+- ✅ Process name
 
-**Funções Auxiliares:**
-- `GetListeningPortsCount()` - Retorna o número de portas em escuta
-- `IsPortListening(port)` - Verifica se uma porta específica está em escuta
-- `GetProcessByPort(port)` - Retorna o processo que está usando uma porta
+**Helper Functions:**
+- `GetListeningPortsCount()` - Returns the number of listening ports
+- `IsPortListening(port)` - Checks if a specific port is listening
+- `GetProcessByPort(port)` - Returns the process using a port
 
-### 2. Scanner de Rede (nmap -sS -sV -p-)
-Scanner de rede completo para múltiplos hosts em notação CIDR.
+### 2. Network Scanner (nmap -sS -sV -p-)
+Complete network scanner for multiple hosts in CIDR notation.
 
-Funcionalidades:
-- ✅ Parse de redes CIDR (ex: 192.168.1.0/24)
-- ✅ Detecção automática de hosts ativos
-- ✅ Scan paralelo de portas TCP
-- ✅ Identificação de 20+ serviços comuns
-- ✅ Banner grabbing para detecção avançada
-- ✅ Configuração de threads (1-100)
-- ✅ Múltiplas opções de range de portas
-- ✅ Relatório detalhado com estatísticas
+Features:
+- ✅ CIDR network parsing (e.g., 192.168.1.0/24)
+- ✅ Automatic detection of active hosts
+- ✅ Parallel TCP port scanning
+- ✅ Identification of 20+ common services
+- ✅ Banner grabbing for advanced detection
+- ✅ Thread configuration (1-100)
+- ✅ Multiple port range options
+- ✅ Detailed report with statistics
 
-**Opções de Portas:**
-- Portas comuns (~20 portas principais)
-- Range específico (ex: 1-1024)
-- Portas customizadas (ex: 80,443,8080)
+**Port Options:**
+- Common ports (~20 main ports)
+- Specific range (e.g., 1-1024)
+- Custom ports (e.g., 80,443,8080)
 
-### 3. Scanner Stealth de Host Único (nmap -sS -sV -p- -T4 --reason)
-Scanner agressivo focado em um único alvo com máximo desempenho.
+### 3. Stealth Single-Host Scanner (nmap -sS -sV -p- -T4 --reason)
+Aggressive scanner focused on a single target with maximum performance.
 
-Funcionalidades:
+Features:
 - ✅ TCP SYN Scan (stealth mode)
-- ✅ Detecção de versão de serviços (-sV)
-- ✅ Timing agressivo T4 (até 200 threads)
-- ✅ Análise de motivos (--reason): syn-ack, conn-refused, timeout
-- ✅ Estados de porta: open, closed, filtered
-- ✅ Banner grabbing com extração de versão
-- ✅ Progresso em tempo real
-- ✅ Estimativa de tempo antes do scan
+- ✅ Service version detection (-sV)
+- ✅ Aggressive T4 timing (up to 200 threads)
+- ✅ Reason analysis (--reason): syn-ack, conn-refused, timeout
+- ✅ Port states: open, closed, filtered
+- ✅ Banner grabbing with version extraction
+- ✅ Real-time progress
+- ✅ Time estimation before scan
 
-**Modos de Scan:**
-- **Rápido**: Portas 1-1024 (~20 segundos)
-- **Completo**: Todas as 65535 portas (~5-10 minutos)
-- **Personalizado**: Range definido pelo usuário
+**Scan Modes:**
+- **Quick**: Ports 1-1024 (~20 seconds)
+- **Full**: All 65535 ports (~5-10 minutes)
+- **Custom**: User-defined range
 
-## 🚀 Instalação
+## 🚀 Installation
 
-### Pré-requisitos
-- Go 1.21 ou superior
-- Privilégios de administrador (recomendado para visualizar todos os processos)
+### Prerequisites
+- Go 1.21 or higher
+- Administrator privileges (recommended to view all processes)
 
-### Compilar
+### Compile
 
 ```bash
-# Navegue até o diretório do projeto
+# Navigate to the project directory
 cd network-toolkit
 
-# Baixe as dependências
+# Download dependencies
 go mod download
 
-# Compile o executável
+# Compile the executable
 go build -o network-toolkit.exe
 ```
 
-## 💻 Uso
+## 💻 Usage
 
-### Executar a Aplicação
+### Run the Application
 
 ```bash
-# Windows (recomendado: executar como Administrador)
+# Windows (recommended: run as Administrator)
 .\network-toolkit.exe
 ```
 
-### Menu Interativo
-A aplicação apresenta um menu interativo:
+### Interactive Menu
+The application presents an interactive menu:
 
 ```
 ============================================================
   Network Toolkit 🔧 - v1.2.0
-  Canivete suíço para atividades de gerenciamento de redes
+  Swiss army knife for network management activities
 ============================================================
 
 ------------------------------------------------------------
-MENU PRINCIPAL
+MAIN MENU
 ------------------------------------------------------------
-[1] Listar Portas em Escuta (netstat -tuln)
-[2] Scanner de Rede (nmap -sS -sV -p-)
-[3] Scanner Stealth de Host Único (nmap -sS -sV -p- -T4)
-[0] Sair
+[1] List Listening Ports (netstat -tuln)
+[2] Network Scanner (nmap -sS -sV -p-)
+[3] Stealth Single-Host Scanner (nmap -sS -sV -p- -T4)
+[0] Exit
 ------------------------------------------------------------
 ```
 
-### Exemplo de Saída - Portas em Escuta
+### Example Output - Listening Ports
 
 ```
-=== PORTAS EM ESCUTA ===
-ENDEREÇO             PORTA      ESTADO          PID        PROCESSO
+=== LISTENING PORTS ===
+ADDRESS              PORT       STATE           PID        PROCESS
 --------------------------------------------------------------------------------------------
 0.0.0.0              80         LISTEN          1234       nginx.exe
 0.0.0.0              443        LISTEN          1234       nginx.exe
 127.0.0.1            3306       LISTEN          5678       mysqld.exe
 0.0.0.0              8080       LISTEN          9012       java.exe
 
-Total: 4 porta(s) em escuta
+Total: 4 listening port(s)
 ```
 
-### Exemplo de Saída - Scanner de Rede
+### Example Output - Network Scanner
 
 ```
-🔍 Iniciando scan de rede: 192.168.1.0/24
-📊 Hosts a escanear: 254
-🔌 Portas por host: 20
+🔍 Starting network scan: 192.168.1.0/24
+📊 Hosts to scan: 254
+🔌 Ports per host: 20
 ⚙️  Threads: 10
 
-✅ 192.168.1.1 - 4 porta(s) aberta(s)
-✅ 192.168.1.20 - 6 porta(s) aberta(s)
+✅ 192.168.1.1 - 4 open port(s)
+✅ 192.168.1.20 - 6 open port(s)
 
 ================================================================================
-📊 RELATÓRIO DE SCAN DE REDE
+📊 NETWORK SCAN REPORT
 ================================================================================
 
 🖥️  HOST: 192.168.1.1 (router.local)
-   Tempo de scan: 2.3s
-   🔓 Portas abertas: 4
+   Scan time: 2.3s
+   🔓 Open ports: 4
 
-   PORTA      SERVIÇO              BANNER
+   PORT       SERVICE              BANNER
    ----------------------------------------------------------------------
    80         HTTP                 nginx/1.18.0
    443        HTTPS                
@@ -147,7 +147,7 @@ Total: 4 porta(s) em escuta
    8080       HTTP-Proxy           
 ```
 
-### Exemplo de Saída - Scanner Stealth
+### Example Output - Stealth Scanner
 
 ```
 🎯 TARGET: 192.168.1.20 (server.local)
@@ -157,22 +157,22 @@ Total: 4 porta(s) em escuta
 ✅ Port 22/tcp      open    SSH
 ✅ Port 80/tcp      open    HTTP
 ✅ Port 443/tcp     open    HTTPS
-⏳ Progresso: 25% (16384/65535 portas escaneadas)
+⏳ Progress: 25% (16384/65535 ports scanned)
 
 ================================================================================
-🎯 RELATÓRIO DE SCAN STEALTH (NMAP-LIKE)
+🎯 STEALTH SCAN REPORT (NMAP-LIKE)
 ================================================================================
 
 📍 TARGET: 192.168.1.20 (server.local)
-⏱️  Duração: 5m 23s
+⏱️  Duration: 5m 23s
 
-📊 ESTATÍSTICAS
-   🟢 Abertas:   8
-   🔴 Fechadas:  65520
-   🟡 Filtradas: 7
+📊 STATISTICS
+   🟢 Open:   8
+   🔴 Closed:  65520
+   🟡 Filtered: 7
 
-🔓 PORTAS ABERTAS DETECTADAS
-PORTA      ESTADO     SERVIÇO         RAZÃO                VERSÃO/BANNER
+🔓 DETECTED OPEN PORTS
+PORT       STATE      SERVICE         REASON               VERSION/BANNER
 ----------------------------------------------------------------------------------
 22         open       SSH             syn-ack              OpenSSH_8.2p1 Ubuntu
 80         open       HTTP            syn-ack              nginx/1.18.0
@@ -180,144 +180,144 @@ PORTA      ESTADO     SERVIÇO         RAZÃO                VERSÃO/BANNER
 3306       open       MySQL           syn-ack              MySQL 8.0.28
 ```
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```
 network-toolkit/
-├── main.go                          # Entrada da aplicação e menu interativo
+├── main.go                          # Application entry point and interactive menu
 ├── network/
-│   ├── listening_ports.go           # Módulo de portas em escuta
-│   ├── port_scanner.go              # Scanner de rede CIDR
-│   └── port_scanner_stealthy.go     # Scanner stealth de host único
-├── go.mod                           # Gerenciamento de dependências
-├── go.sum                           # Checksums das dependências
-├── .gitignore                       # Arquivos ignorados pelo Git
-├── network-toolkit.exe              # Executável compilado
-└── README.md                        # Este arquivo
+│   ├── listening_ports.go           # Listening ports module
+│   ├── port_scanner.go              # CIDR network scanner
+│   └── port_scanner_stealthy.go     # Single-host stealth scanner
+├── go.mod                           # Dependency management
+├── go.sum                           # Dependency checksums
+├── .gitignore                       # Files ignored by Git
+├── network-toolkit.exe              # Compiled executable
+└── README.md                        # This file
 ```
 
-## 📦 Dependências
+## 📦 Dependencies
 
-- [`github.com/shirou/gopsutil/v3`](https://github.com/shirou/gopsutil) - Biblioteca para obter informações de sistema, processos e rede de forma multiplataforma
+- [`github.com/shirou/gopsutil/v3`](https://github.com/shirou/gopsutil) - Library to get system, process, and network information in a cross-platform manner
 
-## 📝 Notas Importantes
+## 📝 Important Notes
 
 ### Windows
-- **Privilégios de Administrador**: Execute o programa como Administrador para visualizar informações completas de todos os processos
-- **Windows Defender/Antivírus**: Algumas soluções de segurança podem alertar sobre o executável. Isso é normal para ferramentas de rede.
+- **Administrator Privileges**: Run the program as Administrator to view complete information for all processes
+- **Windows Defender/Antivirus**: Some security solutions may alert about the executable. This is normal for network tools.
 
-### Compatibilidade
+### Compatibility
 - ✅ Windows 10/11
 - ✅ Windows Server 2016+
-- ⚠️ Linux (funcionalidade básica - necessita testes)
-- ⚠️ macOS (funcionalidade básica - necessita testes)
+- ⚠️ Linux (basic functionality - requires testing)
+- ⚠️ macOS (basic functionality - requires testing)
 
-### ⚠️ Avisos de Segurança e Uso Ético
+### ⚠️ Security Warnings and Ethical Use
 
-**IMPORTANTE**: As funcionalidades de scan de rede devem ser utilizadas apenas:
-- Em redes e sistemas que você possui ou tem autorização explícita
-- Para fins de auditoria de segurança legítima
-- Em ambientes de teste e desenvolvimento próprios
+**IMPORTANT**: Network scanning features should only be used:
+- On networks and systems you own or have explicit authorization for
+- For legitimate security auditing purposes
+- In your own testing and development environments
 
-**Uso não autorizado pode:**
-- Violar leis de crimes cibernéticos
-- Resultar em ações legais
-- Ser detectado por sistemas IDS/IPS
-- Gerar alertas de segurança
+**Unauthorized use may:**
+- Violate cybercrime laws
+- Result in legal action
+- Be detected by IDS/IPS systems
+- Generate security alerts
 
-**Recomendações:**
-- Sempre obtenha autorização por escrito antes de escanear redes
-- Use em horários de baixo movimento quando possível
-- Configure threads e timeouts apropriados
-- Mantenha logs de atividades de scan
-- Respeite políticas de segurança da informação
+**Recommendations:**
+- Always obtain written authorization before scanning networks
+- Use during low-traffic hours when possible
+- Configure appropriate threads and timeouts
+- Keep logs of scanning activities
+- Respect information security policies
 
-### Limitações Conhecidas
-- Processos do sistema protegidos podem aparecer como "Unknown" sem privilégios administrativos
-- A performance pode variar dependendo do número de conexões ativas no sistema
-- Scanner stealth usa TCP connect scan (não SYN real) devido a limitações do Go
-- Detecção de OS é limitada (não implementada completamente)
-- Suporte apenas para IPv4 no momento
-- Firewalls podem bloquear ou limitar scans de rede
+### Known Limitations
+- Protected system processes may appear as "Unknown" without administrative privileges
+- Performance may vary depending on the number of active connections on the system
+- Stealth scanner uses TCP connect scan (not real SYN) due to Go limitations
+- OS detection is limited (not fully implemented)
+- IPv4 support only at the moment
+- Firewalls may block or limit network scans
 
 ## 🗺️ Roadmap
 
-### ✅ Versão 1.1.0 (Concluída)
-- [x] Scanner de rede com suporte a CIDR
-- [x] Detecção de hosts ativos
-- [x] Scan paralelo de portas TCP
-- [x] Identificação de serviços comuns
-- [x] Banner grabbing básico
+### ✅ Version 1.1.0 (Completed)
+- [x] Network scanner with CIDR support
+- [x] Active host detection
+- [x] Parallel TCP port scanning
+- [x] Common service identification
+- [x] Basic banner grabbing
 
-### ✅ Versão 1.2.0 (Concluída)
-- [x] Scanner stealth de host único
-- [x] Timing agressivo (T4)
-- [x] Detecção de versão de serviços
-- [x] Análise de motivos (--reason)
-- [x] Estados de porta (open/closed/filtered)
-- [x] Progresso em tempo real
+### ✅ Version 1.2.0 (Completed)
+- [x] Single-host stealth scanner
+- [x] Aggressive timing (T4)
+- [x] Service version detection
+- [x] Reason analysis (--reason)
+- [x] Port states (open/closed/filtered)
+- [x] Real-time progress
 
-### Versão 1.3.0 (Em Planejamento)
-- [ ] Adicionar suporte para portas UDP
-- [ ] Implementar filtros (por porta, por processo, por endereço)
-- [ ] Adicionar opção de exportar resultados para CSV/JSON
-- [ ] Melhorar tratamento de erros e mensagens ao usuário
-- [ ] Listar todas as conexões ativas (não apenas LISTEN)
+### Version 1.3.0 (In Planning)
+- [ ] Add UDP port support
+- [ ] Implement filters (by port, by process, by address)
+- [ ] Add option to export results to CSV/JSON
+- [ ] Improve error handling and user messages
+- [ ] List all active connections (not just LISTEN)
 
-### Versão 2.0.0
-- [ ] Teste de conectividade (ping, traceroute)
-- [ ] Análise de latência e jitter
-- [ ] Interface web opcional (modo servidor)
-- [ ] Suporte a IPv6 completo
-- [ ] Detecção de OS (fingerprinting)
-- [ ] Modo de monitoramento contínuo
+### Version 2.0.0
+- [ ] Connectivity testing (ping, traceroute)
+- [ ] Latency and jitter analysis
+- [ ] Optional web interface (server mode)
+- [ ] Full IPv6 support
+- [ ] OS detection (fingerprinting)
+- [ ] Continuous monitoring mode
 
-### Futuras Funcionalidades
-- [ ] Monitoramento de largura de banda por processo
-- [ ] Alertas e notificações
-- [ ] Histórico de conexões
-- [ ] Detecção de conexões suspeitas
-- [ ] Integração com ferramentas de logging
-- [ ] API REST para integração com outras ferramentas
-- [ ] Modo daemon/serviço para monitoramento contínuo
+### Future Features
+- [ ] Bandwidth monitoring per process
+- [ ] Alerts and notifications
+- [ ] Connection history
+- [ ] Suspicious connection detection
+- [ ] Integration with logging tools
+- [ ] REST API for integration with other tools
+- [ ] Daemon/service mode for continuous monitoring
 
-## 🐛 Problemas Conhecidos
+## 🐛 Known Issues
 
-Nenhum problema crítico identificado até o momento.
+No critical issues identified at this time.
 
-## 🤝 Contribuindo
+## 🤝 Contributing
 
-Sugestões e melhorias são bem-vindas! Este projeto está em desenvolvimento ativo.
+Suggestions and improvements are welcome! This project is under active development.
 
-### Como Contribuir
-1. Identifique um bug ou funcionalidade desejada
-2. Implemente a solução
-3. Teste em diferentes cenários
-4. Documente as mudanças
+### How to Contribute
+1. Identify a bug or desired feature
+2. Implement the solution
+3. Test in different scenarios
+4. Document the changes
 
-## 📄 Licença
+## 📄 License
 
-Este projeto é de uso interno e educacional.
+This project is for internal and educational use.
 
-## 👨‍💻 Desenvolvimento
+## 👨‍💻 Development
 
-### Tecnologias Utilizadas
-- **Linguagem**: Go 1.21+
-- **Bibliotecas**: gopsutil v3
-- **Plataforma**: Windows (primário)
+### Technologies Used
+- **Language**: Go 1.21+
+- **Libraries**: gopsutil v3
+- **Platform**: Windows (primary)
 
-### Status do Projeto
-🟢 Em desenvolvimento ativo - v1.2.0
+### Project Status
+🟢 Under active development - v1.2.0
 
-### Última Atualização
-8 de Janeiro de 2026
+### Last Update
+January 8, 2026
 
-### Histórico de Versões
-- **v1.2.0** (08/01/2026) - Scanner Stealth de Host Único
-- **v1.1.0** (07/01/2026) - Scanner de Rede CIDR
-- **v1.0.1** (07/01/2026) - Ajustes intermediários
-- **v1.0.0** (07/01/2026) - Release inicial
+### Version History
+- **v1.2.0** (01/08/2026) - Single-Host Stealth Scanner
+- **v1.1.0** (01/07/2026) - CIDR Network Scanner
+- **v1.0.1** (01/07/2026) - Intermediate adjustments
+- **v1.0.0** (01/07/2026) - Initial release
 
 ---
 
-**Network Toolkit** - Simplificando o gerenciamento de redes 🚀
+**Network Toolkit** - Simplifying network management 🚀

@@ -7,7 +7,7 @@ import (
 	"github.com/shirou/gopsutil/v3/process"
 )
 
-// PortInfo representa informações sobre uma porta em escuta
+// PortInfo represents information about a listening port
 type PortInfo struct {
 	LocalAddr   string
 	LocalPort   uint32
@@ -16,22 +16,22 @@ type PortInfo struct {
 	ProcessName string
 }
 
-// ListListeningPorts lista todas as portas TCP em estado de escuta
+// ListListeningPorts lists all TCP ports in listening state
 func ListListeningPorts() ([]PortInfo, error) {
 	var ports []PortInfo
 
-	// Obter todas as conexões TCP usando gopsutil
+	// Get all TCP connections using gopsutil
 	connections, err := net.Connections("tcp")
 	if err != nil {
-		return nil, fmt.Errorf("erro ao obter conexões TCP: %v", err)
+		return nil, fmt.Errorf("error getting TCP connections: %v", err)
 	}
 
-	// Filtrar apenas conexões em estado LISTEN
+	// Filter only LISTEN state connections
 	for _, conn := range connections {
 		if conn.Status == "LISTEN" {
 			processName := "Unknown"
 
-			// Tentar obter o nome do processo
+			// Try to get process name
 			if conn.Pid > 0 {
 				proc, err := process.NewProcess(conn.Pid)
 				if err == nil {
@@ -54,7 +54,7 @@ func ListListeningPorts() ([]PortInfo, error) {
 	return ports, nil
 }
 
-// PrintListeningPorts imprime as portas em escuta de forma formatada
+// PrintListeningPorts prints listening ports in a formatted way
 func PrintListeningPorts() error {
 	ports, err := ListListeningPorts()
 	if err != nil {
@@ -62,12 +62,12 @@ func PrintListeningPorts() error {
 	}
 
 	if len(ports) == 0 {
-		fmt.Println("\nNenhuma porta em escuta encontrada.")
+		fmt.Println("\nNo listening ports found.")
 		return nil
 	}
 
-	fmt.Println("\n=== PORTAS EM ESCUTA ===")
-	fmt.Printf("%-20s %-10s %-15s %-10s %-s\n", "ENDEREÇO", "PORTA", "ESTADO", "PID", "PROCESSO")
+	fmt.Println("\n=== LISTENING PORTS ===")
+	fmt.Printf("%-20s %-10s %-15s %-10s %-s\n", "ADDRESS", "PORT", "STATE", "PID", "PROCESS")
 	fmt.Println("--------------------------------------------------------------------------------------------")
 
 	for _, port := range ports {
@@ -80,11 +80,10 @@ func PrintListeningPorts() error {
 		)
 	}
 
-	fmt.Printf("\nTotal: %d porta(s) em escuta\n", len(ports))
+	fmt.Printf("\nTotal: %d listening port(s)\n", len(ports))
 	return nil
 }
 
-// GetListeningPortsCount retorna o número de portas em escuta
 func GetListeningPortsCount() (int, error) {
 	ports, err := ListListeningPorts()
 	if err != nil {

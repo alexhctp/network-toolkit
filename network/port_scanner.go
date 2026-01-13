@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// PortScanResult representa o resultado de um scan de porta
+// PortScanResult represents the result of a port scan
 type PortScanResult struct {
 	IP       string
 	Port     int
@@ -19,7 +19,7 @@ type PortScanResult struct {
 	ScanTime time.Duration
 }
 
-// HostScanResult representa o resultado completo de um scan de host
+// HostScanResult represents the complete result of a host scan
 type HostScanResult struct {
 	IP         string
 	IsAlive    bool
@@ -30,17 +30,17 @@ type HostScanResult struct {
 	ScanTime   time.Duration
 }
 
-// NetworkScanConfig configurações do scan de rede
+// NetworkScanConfig network scan configuration
 type NetworkScanConfig struct {
-	Network          string        // CIDR notation (ex: 192.168.1.0/24)
-	PortRange        string        // Range de portas (ex: "1-1024" ou "all")
-	Timeout          time.Duration // Timeout por porta
-	Threads          int           // Número de threads paralelas
-	ServiceDetection bool          // Detectar serviços
-	OSDetection      bool          // Detectar SO (limitado)
+	Network          string        // CIDR notation (e.g., 192.168.1.0/24)
+	PortRange        string        // Port range (e.g., "1-1024" or "all")
+	Timeout          time.Duration // Timeout per port
+	Threads          int           // Number of parallel threads
+	ServiceDetection bool          // Detect services
+	OSDetection      bool          // Detect OS (limited)
 }
 
-// Mapa de serviços comuns por porta
+// Map of common services by port
 var commonServices = map[int]string{
 	20:    "FTP-DATA",
 	21:    "FTP",
@@ -63,11 +63,11 @@ var commonServices = map[int]string{
 	6379:  "Redis",
 }
 
-// ParseCIDR converte CIDR em lista de IPs
+// ParseCIDR converts CIDR to a list of IPs
 func ParseCIDR(cidr string) ([]string, error) {
 	ip, ipNet, err := net.ParseCIDR(cidr)
 	if err != nil {
-		return nil, fmt.Errorf("CIDR inválido: %v", err)
+		return nil, fmt.Errorf("invalid CIDR: %v", err)
 	}
 
 	var ips []string
@@ -75,7 +75,7 @@ func ParseCIDR(cidr string) ([]string, error) {
 		ips = append(ips, ip.String())
 	}
 
-	// Remover network address e broadcast address
+	// Remove network address and broadcast address
 	if len(ips) > 2 {
 		ips = ips[1 : len(ips)-1]
 	}
@@ -83,7 +83,7 @@ func ParseCIDR(cidr string) ([]string, error) {
 	return ips, nil
 }
 
-// incIP incrementa um endereço IP
+// incIP increments an IP address
 func incIP(ip net.IP) {
 	for j := len(ip) - 1; j >= 0; j-- {
 		ip[j]++
@@ -93,15 +93,15 @@ func incIP(ip net.IP) {
 	}
 }
 
-// ParsePortRange converte string de range em lista de portas
+// ParsePortRange converts range string to list of ports
 func ParsePortRange(portRange string) []int {
 	if portRange == "all" || portRange == "" {
-		// Scan completo seria muito lento, vamos usar portas comuns
+		// Full scan would be too slow, let's use common ports
 		var ports []int
 		for port := range commonServices {
 			ports = append(ports, port)
 		}
-		// Adicionar algumas portas adicionais importantes
+		// Add some additional important ports
 		additionalPorts := []int{8000, 8008, 8888, 9090, 9200, 9300}
 		ports = append(ports, additionalPorts...)
 		sort.Ints(ports)
@@ -146,9 +146,9 @@ func ParsePortRange(portRange string) []int {
 	return ports
 }
 
-// IsHostAlive verifica se o host está ativo (ping TCP)
+// IsHostAlive checks if the host is alive (TCP ping)
 func IsHostAlive(ip string, timeout time.Duration) bool {
-	// Tenta conectar em portas comuns
+	// Try to connect to common ports
 	commonPorts := []int{80, 443, 22, 21, 25, 3389}
 
 	for _, port := range commonPorts {
@@ -163,7 +163,7 @@ func IsHostAlive(ip string, timeout time.Duration) bool {
 	return false
 }
 
-// ScanPort escaneia uma porta específica em um IP
+// ScanPort scans a specific port on an IP
 func ScanPort(ip string, port int, timeout time.Duration, serviceDetection bool) PortScanResult {
 	result := PortScanResult{
 		IP:      ip,
@@ -185,12 +185,12 @@ func ScanPort(ip string, port int, timeout time.Duration, serviceDetection bool)
 
 	result.IsOpen = true
 
-	// Identificar serviço
+	// Identify service
 	if service, exists := commonServices[port]; exists {
 		result.Service = service
 	}
 
-	// Detecção de serviço através de banner grabbing
+	// Service detection through banner grabbing
 	if serviceDetection {
 		conn.SetReadDeadline(time.Now().Add(timeout))
 		buffer := make([]byte, 1024)
@@ -205,7 +205,7 @@ func ScanPort(ip string, port int, timeout time.Duration, serviceDetection bool)
 	return result
 }
 
-// identifyServiceByBanner tenta identificar o serviço pelo banner
+// identifyServiceByBanner tries to identify service by banner
 func identifyServiceByBanner(banner, currentService string) string {
 	banner = strings.ToLower(banner)
 
@@ -226,7 +226,7 @@ func identifyServiceByBanner(banner, currentService string) string {
 	return currentService
 }
 
-// ScanHost escaneia todos as portas de um host
+// ScanHost scans all ports of a host
 func ScanHost(ip string, ports []int, config NetworkScanConfig) HostScanResult {
 	result := HostScanResult{
 		IP:         ip,
@@ -237,7 +237,7 @@ func ScanHost(ip string, ports []int, config NetworkScanConfig) HostScanResult {
 
 	start := time.Now()
 
-	// Verificar se host está ativo
+	// Check if host is alive
 	if !IsHostAlive(ip, config.Timeout) {
 		result.ScanTime = time.Since(start)
 		return result
@@ -309,12 +309,12 @@ func ScanNetwork(config NetworkScanConfig) ([]HostScanResult, error) {
 	// Parse portas
 	ports := ParsePortRange(config.PortRange)
 	if len(ports) == 0 {
-		return nil, fmt.Errorf("nenhuma porta válida especificada")
+		return nil, fmt.Errorf("no valid ports specified")
 	}
 
-	fmt.Printf("\n🔍 Iniciando scan de rede: %s\n", config.Network)
-	fmt.Printf("📊 Hosts a escanear: %d\n", len(ips))
-	fmt.Printf("🔌 Portas por host: %d\n", len(ports))
+	fmt.Printf("\n🔍 Starting network scan: %s\n", config.Network)
+	fmt.Printf("📊 Hosts to scan: %d\n", len(ips))
+	fmt.Printf("🔌 Ports per host: %d\n", len(ports))
 	fmt.Printf("⚙️  Threads: %d\n", config.Threads)
 	fmt.Printf("⏱️  Timeout: %v\n\n", config.Timeout)
 
@@ -340,7 +340,7 @@ func ScanNetwork(config NetworkScanConfig) ([]HostScanResult, error) {
 				results = append(results, result)
 				resultsMutex.Unlock()
 
-				fmt.Printf("✅ %s - %d porta(s) aberta(s)\n", targetIP, len(result.OpenPorts))
+				fmt.Printf("✅ %s - %d open port(s)\n", targetIP, len(result.OpenPorts))
 			}
 		}(ip)
 	}
@@ -350,15 +350,15 @@ func ScanNetwork(config NetworkScanConfig) ([]HostScanResult, error) {
 	return results, nil
 }
 
-// PrintScanResults imprime os resultados do scan de forma formatada
+// PrintScanResults prints scan results in a formatted way
 func PrintScanResults(results []HostScanResult) {
 	if len(results) == 0 {
-		fmt.Println("\n❌ Nenhum host ativo encontrado na rede.")
+		fmt.Println("\n❌ No active hosts found on the network.")
 		return
 	}
 
 	fmt.Printf("\n\n" + strings.Repeat("=", 80) + "\n")
-	fmt.Printf("📊 RELATÓRIO DE SCAN DE REDE\n")
+	fmt.Printf("📊 NETWORK SCAN REPORT\n")
 	fmt.Printf(strings.Repeat("=", 80) + "\n\n")
 
 	totalOpenPorts := 0
@@ -369,15 +369,15 @@ func PrintScanResults(results []HostScanResult) {
 			fmt.Printf(" (%s)", host.Hostname)
 		}
 		fmt.Printf("\n")
-		fmt.Printf("   Tempo de scan: %v\n", host.ScanTime.Round(time.Millisecond))
+		fmt.Printf("   Scan time: %v\n", host.ScanTime.Round(time.Millisecond))
 
 		if len(host.OpenPorts) == 0 {
-			fmt.Printf("   ⚠️  Nenhuma porta aberta encontrada\n\n")
+			fmt.Printf("   ⚠️  No open ports found\n\n")
 			continue
 		}
 
-		fmt.Printf("   🔓 Portas abertas: %d\n\n", len(host.OpenPorts))
-		fmt.Printf("   %-10s %-20s %-30s\n", "PORTA", "SERVIÇO", "BANNER")
+		fmt.Printf("   🔓 Open ports: %d\n\n", len(host.OpenPorts))
+		fmt.Printf("   %-10s %-20s %-30s\n", "PORT", "SERVICE", "BANNER")
 		fmt.Printf("   " + strings.Repeat("-", 70) + "\n")
 
 		for _, port := range host.OpenPorts {
@@ -392,8 +392,8 @@ func PrintScanResults(results []HostScanResult) {
 	}
 
 	fmt.Printf(strings.Repeat("=", 80) + "\n")
-	fmt.Printf("📈 RESUMO:\n")
-	fmt.Printf("   Hosts ativos: %d\n", len(results))
-	fmt.Printf("   Total de portas abertas: %d\n", totalOpenPorts)
+	fmt.Printf("📈 SUMMARY:\n")
+	fmt.Printf("   Active hosts: %d\n", len(results))
+	fmt.Printf("   Total open ports: %d\n", totalOpenPorts)
 	fmt.Printf(strings.Repeat("=", 80) + "\n\n")
 }
