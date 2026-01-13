@@ -25,7 +25,7 @@ func main() {
 	for {
 		showMenu()
 
-		fmt.Print("\nEscolha uma opção: ")
+		fmt.Print("\nPick a choice: ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Printf("Error reading input: %v\n", err)
