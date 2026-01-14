@@ -56,7 +56,7 @@ func main() {
 func showHeader() {
 	fmt.Println("=" + strings.Repeat("=", 60))
 	fmt.Printf("  %s - v%s\n", appTitle, appVersion)
-	fmt.Println("  Swiss army knife for network management activities")
+	fmt.Println("  Swiss army knife for network management activities AKA Jack of all trades")
 	fmt.Println("=" + strings.Repeat("=", 60))
 }
 
