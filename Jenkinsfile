@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     tools {
-        go 'go-1.21' // Name configured in Jenkins Global Tool Configuration
+        go 'go-1.25.6' // Name configured in Jenkins Global Tool Configuration
     }
     
     environment {
