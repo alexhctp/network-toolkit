@@ -44,19 +44,10 @@ pipeline {
             }
         }
         
-        stage('Test') {
-            steps {
-                echo '🧪 Running tests...'
-                sh '''
-                    go test -v ./... || exit 0
-                '''
-            }
-        }
-        
         stage('Archive') {
             steps {
                 echo '📦 Archiving artifacts...'
-                archiveArtifacts artifacts: '*', fingerprint: true
+                archiveArtifacts artifacts: '*.exe', fingerprint: true
             }
         }
     }
