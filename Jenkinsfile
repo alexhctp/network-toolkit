@@ -40,7 +40,8 @@ pipeline {
         stage('Build') {
             steps {
                 echo '🔨 Building application...'
-                sh 'go build -v -o $APP_NAME'
+                // sh 'go build -v -o $APP_NAME'
+                sh 'go build -o $APP_NAME'                
             }
         }
         
