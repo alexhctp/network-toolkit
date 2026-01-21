@@ -47,7 +47,7 @@ pipeline {
         stage('Archive') {
             steps {
                 echo '📦 Archiving artifacts...'
-                archiveArtifacts artifacts: '*.exe', fingerprint: true
+                archiveArtifacts artifacts: '*', fingerprint: true
             }
         }
     }
