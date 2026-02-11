@@ -304,7 +304,7 @@ This project is for internal and educational use.
 ### Technologies Used
 - **Language**: Go 1.21+
 - **Libraries**: gopsutil v3
-- **Platform**: Windows (primary)
+- **Platform**: Multiplatform (run on Windows and Linux, build needed)
 
 ### Project Status
 🟢 Under active development - v1.2.0
@@ -321,3 +321,4 @@ January 8, 2026
 ---
 
 **Network Toolkit** - Simplifying network management 🚀
+
